@@ -17,8 +17,65 @@ import {
   CheckOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
+import "chartjs-plugin-zoom";
+
+import { Line } from "react-chartjs-2";
+import "chart.js/auto";
 
 const originData: any = []; // fill this with your sheet data
+
+const options: any = {
+  responsive: true,
+  plugins: {
+    tooltip: {
+      mode: "index",
+      intersect: false,
+    },
+    legend: {
+      display: true,
+    },
+  },
+  hover: {
+    mode: "nearest",
+    intersect: true,
+    onHover: (event: any, chartElement: any) => {
+      if (chartElement.length) {
+        const ctx = event.chart.ctx;
+        const x = chartElement[0].element.x;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x, event.chart.chartArea.top);
+        ctx.lineTo(x, event.chart.chartArea.bottom);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.stroke();
+        ctx.restore();
+      }
+    },
+  },
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: "Month",
+      },
+    },
+    y: {
+      display: true,
+      title: {
+        display: true,
+        text: "Value",
+      },
+    },
+  },
+  elements: {
+    line: {
+      tension: 0,
+    },
+  },
+};
 
 export default function SheetPage({ params }: { params: { title: string } }) {
   const { title } = params;
@@ -41,7 +98,33 @@ export default function SheetPage({ params }: { params: { title: string } }) {
     setEditingKey("");
   };
 
-  const sendDataToBackend = async (updatedData: any) => {
+  const getChartData = () => {
+    return {
+      labels: data.map((item: any) => item.Month),
+      datasets: [
+        {
+          label: "Revenue",
+          data: data.map((item: any) => item.Revenue),
+          borderColor: "rgb(75, 192, 192)",
+          backgroundColor: "rgba(75, 192, 192, 0.5)",
+        },
+        {
+          label: "Expenses",
+          data: data.map((item: any) => item.Expenses),
+          borderColor: "rgb(255, 99, 132)",
+          backgroundColor: "rgba(255, 99, 132, 0.5)",
+        },
+        {
+          label: "Profit",
+          data: data.map((item: any) => item.Profit),
+          borderColor: "rgb(120, 99, 132)",
+          backgroundColor: "rgba(120, 99, 132, 0.5)",
+        },
+      ],
+    };
+  };
+
+  const callApi = async (updatedData: any) => {
     try {
       const response = await fetch(
         `http://localhost:4200/csv/update/${title}`,
@@ -72,7 +155,7 @@ export default function SheetPage({ params }: { params: { title: string } }) {
     try {
       const updatedData = data.map(({ key, ...item }: any) => item);
 
-      await sendDataToBackend(updatedData);
+      await callApi(updatedData);
 
       notification.success({
         message: "Update Successful",
@@ -245,17 +328,34 @@ export default function SheetPage({ params }: { params: { title: string } }) {
     );
   };
 
+  // const onHover: any = (event: any, chartElement: any): any => {
+  //   event.native.target.style.cursor = chartElement[0] ? "pointer" : "default";
+  // };
+
   return (
     <Form form={form} component={false}>
       <Card style={{ marginBottom: "20px", backgroundColor: "lightgrey" }}>
         <h1
           style={{ textAlign: "center", fontSize: "24px", fontStyle: "italic" }}
         >
-          Editing Sheet: {title || "N/A"}
+          Editing: {title || "N/A"}
         </h1>
       </Card>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100vw",
+          height: "400px",
+        }}
+      >
+        <Line
+          style={{ height: "100%", width: "60vw" }}
+          data={getChartData()}
+          options={options}
+        />
+      </div>
 
-      {/* Submit Button Container */}
       <div
         style={{
           display: "flex",
@@ -266,12 +366,11 @@ export default function SheetPage({ params }: { params: { title: string } }) {
         <Button
           type="primary"
           onClick={handleSubmit}
-          className="ant-btn-primary"
+          className="ant-btn-primary mt-10"
         >
           Submit Changes
         </Button>
       </div>
-
       <Table
         components={{
           body: {
