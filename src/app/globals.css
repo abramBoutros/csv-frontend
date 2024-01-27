@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* --foreground-rgb: 0, 0, 0; */
+  /* --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255; */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
+    /* --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0; */
   }
 }
 
@@ -30,4 +30,51 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.big-button {
+  font-size: 20px;
+  padding: 10px 20px;
+}
+
+.custom-button {
+  background-color: #007bff;
+  color: #fff;
+  transition: box-shadow 0.3s;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button:hover {
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.folder {
+  color: #000; /* Set the text color for folder names */
+}
+
+.metadata {
+  color: #555; /* Set the text color for metadata */
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.ant-btn-primary {
+  background-color: #1890ff; /* default Ant Design blue */
+  color: #fff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
 }
